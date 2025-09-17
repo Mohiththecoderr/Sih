@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduQuest - Digital Learning Gamification Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);
+            --dark-bg: linear-gradient(135deg, #0c0c1e 0%, #1a1a2e 100%);
+            --light-bg: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --glass-dark: rgba(255, 255, 255, 0.08);
+            --glass-light: rgba(255, 255, 255, 0.25);
+            --glass-border-dark: rgba(255, 255, 255, 0.15);
+            --glass-border-light: rgba(255, 255, 255, 0.35);
+            --text-primary-dark: #ffffff;
+            --text-secondary-dark: rgba(255, 255, 255, 0.7);
+            --text-primary-light: #1e293b;
+            --text-secondary-light: rgba(30, 41, 59, 0.7);
+            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            transition: all 0.4s ease;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(120, 119, 198, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 60% 20%, rgba(120, 219, 255, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 30% 80%, rgba(253, 187, 45, 0.2) 0%, transparent 50%);
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        body.dark {
+            color: var(--text-primary-dark);
+        }
+
+        body.dark::before {
+            background: var(--dark-bg);
+        }
+
+        body.light {
+            color: var(--text-primary-light);
+        }
+
+        body.light::before {
+            background: var(--light-bg);
+        }
+
+        body.light::after {
+            opacity: 0.5;
+        }
+
+        .glass {
+            background: var(--glass-dark);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border-dark);
+            box-shadow: var(--shadow-dark);
+        }
+
+        body.light .glass {
+            background: var(--glass-light);
+            border-color: var(--glass-border-light);
+            box-shadow: var(--shadow-light);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--glass-border-dark);
+            animation: slideInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark .header {
+            background: rgba(12, 12, 30, 0.6);
+            border-bottom-color: var(--glass-border-dark);
+        }
+
+        body.light .header {
+            background: rgba(248, 250, 252, 0.6);
+            border-bottom-color: var(--glass-border-light);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s infinite;
+        }
+
+        .theme-toggle {
+            padding: 1rem;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .navigation {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+        }
+
+        .nav-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-4px);
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .nav-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card {
+            border-radius: 30px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            animation: cardSlideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: 30px 30px 0 0;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--primary-gradient);
+            border-radius: 32px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::after {
+            opacity: 0.1;
+        }
+
+        .card h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card h3 i {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-secondary-dark);
+        }
+
+        body.light .form-label {
+            color: var(--text-secondary-light);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1.2rem 1.5rem;
+            border-radius: 20px;
+            border: none;
+            font-size: 1rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary-dark);
+        }
+
+        body.light .form-input::placeholder {
+            color: var(--text-secondary-light);
+        }
+
+        .btn {
+            padding: 1.2rem 2rem;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            text-decoration: none;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-action {
+            width: 100%;
+            margin-bottom: 1rem;
+            background: var(--secondary-gradient);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 36px rgba(245, 87, 108, 0.5);
+        }
+
+        .progress-section {
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 25px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .progress-points {
+            background: var(--success-gradient);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(79, 172, 254, 0.3);
+        }
+
+        .progress-bar-container {
+            height: 16px;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--success-gradient);
+            border-radius: 25px;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .progress-percentage {
+            margin-top: 0.75rem;
+            text-align: right;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary-dark);
+        }
+
+        body.light .progress-percentage {
+            color: var(--text-secondary-light);
+        }
+
+        .badges-container {
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 25px;
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .badge {
+            background: var(--warning-gradient);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 25px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(253, 187, 45, 0.4);
+            animation: badgePopIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .badge:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .badge i {
+            font-size: 1.8rem;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            border-radius: 25px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .leaderboard-item:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .leaderboard-rank {
+            font-size: 1.8rem;
+            font-weight: 800;
+            width: 70px;
+            text-align: center;
+        }
+
+        .leaderboard-rank.first { 
+            color: #ffd700; 
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        .leaderboard-rank.second { 
+            color: #c0c0c0; 
+            text-shadow: 0 0 20px rgba(192, 192, 192, 0.5);
+        }
+        .leaderboard-rank.third { 
+            color: #cd7f32; 
+            text-shadow: 0 0 20px rgba(205, 127, 50, 0.5);
+        }
+
+        .leaderboard-info {
+            flex: 1;
+            margin-left: 1.5rem;
+        }
+
+        .leaderboard-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .leaderboard-village {
+            font-size: 1rem;
+            color: var(--text-secondary-dark);
+        }
+
+        body.light .leaderboard-village {
+            color: var(--text-secondary-light);
+        }
+
+        .leaderboard-points {
+            font-weight: 700;
+            font-size: 1.3rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .certificate {
+            text-align: center;
+            padding: 3rem;
+            border-radius: 30px;
+            position: relative;
+            background: var(--glass-dark);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--glass-border-dark);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        body.light .certificate {
+            background: var(--glass-light);
+            border-color: var(--glass-border-light);
+            box-shadow: 0 20px 60px rgba(31, 38, 135, 0.2);
+        }
+
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--primary-gradient);
+            border-radius: 32px;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        .certificate-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .certificate-content {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin: 2rem 0;
+        }
+
+        .certificate-date {
+            margin-top: 2rem;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--text-secondary-dark);
+        }
+
+        body.light .certificate-date {
+            color: var(--text-secondary-light);
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 120px;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .toast {
+            padding: 1.2rem 1.8rem;
+            border-radius: 25px;
+            font-weight: 600;
+            animation: toastSlideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 380px;
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border-dark);
+        }
+
+        body.light .toast {
+            border-color: var(--glass-border-light);
+        }
+
+        .toast i {
+            font-size: 1.3rem;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .confetti {
+            position: fixed;
+            top: -15px;
+            z-index: 1000;
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            animation: confettiFall 4s linear forwards;
+            backdrop-filter: blur(2px);
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 2rem;
+                border-radius: 25px;
+            }
+            
+            .navigation {
+                padding: 1rem;
+                gap: 0.5rem;
+            }
+            
+            .nav-btn {
+                padding: 0.8rem 1.2rem;
+                font-size: 0.85rem;
+            }
+            
+            .toast-container {
+                right: 1rem;
+                left: 1rem;
+            }
+            
+            .badges-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .progress-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(2deg); }
+        }
+
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes cardSlideIn {
+            from {
+                transform: translateX(-60px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes badgePopIn {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            80% {
+                transform: scale(1.15) rotate(0deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-120px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(120px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotateZ(0deg) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotateZ(720deg) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                filter: brightness(1);
+            }
+            50% { 
+                transform: scale(1.05);
+                filter: brightness(1.2);
+            }
+        }
+    </style>
+</head>
+<body class="dark">
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-gamepad"></i>
+                <span>EduQuest</span>
+            </div>
+            <button class="theme-toggle glass" onclick="toggleTheme()">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+        </div>
+    </header>
+
+    <nav class="navigation">
+        <button class="nav-btn glass active" onclick="showPage('register')">
+            <i class="fas fa-user-plus"></i>
+            Register
+        </button>
+        <button class="nav-btn glass" onclick="showPage('progress')">
+            <i class="fas fa-chart-line"></i>
+            Progress
+        </button>
+        <button class="nav-btn glass" onclick="showPage('leaderboard')">
+            <i class="fas fa-trophy"></i>
+            Leaderboard
+        </button>
+        <button class="nav-btn glass" onclick="showPage('certificate')">
+            <i class="fas fa-certificate"></i>
+            Certificate
+        </button>
+        <button class="nav-btn glass" onclick="resetApp()">
+            <i class="fas fa-undo"></i>
+            Reset
+        </button>
+    </nav>
+
+    <div class="container">
+        <!-- Register Page -->
+        <div id="register" class="page active">
+            <div class="card glass">
+                <h3>
+                    <i class="fas fa-user-plus"></i>
+                    Student Registration
+                </h3>
+                <p style="margin-bottom: 2rem; opacity: 0.8;">Join the digital learning revolution and start your gamified journey through the realms of knowledge!</p>
+                
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input id="studentNameInput" class="form-input glass" placeholder="Enter your full name" />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Village</label>
+                    <input id="studentVillageInput" class="form-input glass" placeholder="Enter your village (default: Nabha)" />
+                </div>
+                
+                <button class="btn btn-primary" onclick="registerStudent()" style="width: 100%; margin-top: 1rem;">
+                    <i class="fas fa-rocket"></i>
+                    Start Learning Journey
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Page -->
+        <div id="progress" class="page">
+            <div class="card glass">
+                <h3>
+                    <i class="fas fa-chart-line"></i>
+                    Learning Progress Dashboard
+                </h3>
+                
+                <div class="progress-section glass">
+                    <div class="progress-header">
+                        <div>
+                            <div class="progress-title" id="progressName">—</div>
+                            <div style="opacity: 0.7; margin-top: 0.25rem; font-size: 1.1rem;" id="progressVillage">Village: —</div>
+                        </div>
+                        <div class="progress-points" id="progressPointsBadge">0 Points</div>
+                    </div>
+                    
+                    <div class="progress-bar-container glass">
+                        <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-percentage" id="progressPercentage">0% Complete</div>
+                </div>
+
+                <div class="badges-container glass">
+                    <h4 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 1.3rem;">
+                        <i class="fas fa-medal"></i>
+                        Achievement Badges
+                    </h4>
+                    <div class="badges-grid" id="badgesGrid">
+                        <div style="text-align: center; padding: 2rem; opacity: 0.6; font-size: 1.1rem;">
+                            Complete activities to unlock badges! 🏆
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h4 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem; font-size: 1.3rem;">
+                        <i class="fas fa-tasks"></i>
+                        Learning Activities
+                    </h4>
+                    
+                    <button class="btn btn-action" onclick="recordAction('open_app', 10)">
+                        <i class="fas fa-mobile-alt"></i>
+                        Open Learning App (+10 points)
+                    </button>
+                    
+                    <button class="btn btn-action" onclick="recordAction('complete_lesson', 25)">
+                        <i class="fas fa-book-open"></i>
+                        Complete Digital Lesson (+25 points)
+                    </button>
+                    
+                    <button class="btn btn-action" onclick="recordAction('watch_video', 15)">
+                        <i class="fas fa-play-circle"></i>
+                        Watch Educational Video (+15 points)
+                    </button>
+                    
+                    <button class="btn btn-action" onclick="recordAction('take_quiz', 30)">
+                        <i class="fas fa-question-circle"></i>
+                        Take Practice Quiz (+30 points)
+                    </button>
+                    
+                    <button class="btn btn-action" onclick="recordAction('join_discussion', 20)">
+                        <i class="fas fa-comments"></i>
+                        Join Online Discussion (+20 points)
+                    </button>
+                    
+                    <button class="btn btn-action" onclick="recordAction('submit_assignment', 50)">
+                        <i class="fas fa-upload"></i>
+                        Submit Assignment (+50 points)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Page -->
+        <div id="leaderboard" class="page">
+            <div class="card glass">
+                <h3>
+                    <i class="fas fa-trophy"></i>
+                    Digital Learning Champions
+                </h3>
+                <p style="margin-bottom: 2rem; opacity: 0.8;">See how you rank among your fellow digital learners from villages across the region!</p>
+                
+                <div id="leaderboardList">
+                    <!-- Leaderboard will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificate Page -->
+        <div id="certificate" class="page">
+            <div class="card glass">
+                <h3>
+                    <i class="fas fa-certificate"></i>
+                    Digital Learning Certificate
+                </h3>
+                <p style="margin-bottom: 2rem; opacity: 0.8;">Earn your official certificate by completing the digital learning program!</p>
+                
+                <div class="certificate" id="certificateContent">
+                    <div class="certificate-title">
+                        <i class="fas fa-award" style="margin-right: 1rem; font-size: 2.5rem;"></i>
+                        Certificate of Digital Excellence
+                    </div>
+                    
+                    <div class="certificate-content">
+                        This certifies that<br><br>
+                        <strong style="font-size: 1.6rem; color: #667eea;" id="certificateName">Student Name</strong><br><br>
+                        has successfully completed the<br>
+                        <strong>Digital Learning Gamification Program</strong><br><br>
+                        and has demonstrated exceptional commitment to<br>
+                        modern education and digital literacy.
+                    </div>
+                    
+                    <div class="certificate-date" id="certificateDate">
+                        Date: Not yet earned
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="generateCertificate()" style="margin-top: 2rem;" id="generateBtn">
+                        <i class="fas fa-download"></i>
+                        Generate Certificate (Need 200+ points)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let appState = {
+            currentStudent: null,
+            students: [],
+            theme: 'dark',
+            currentPage: 'register'
+        };
+
+        // Load state from memory on page load
+        window.addEventListener('load', function() {
+            initializeApp();
+        });
+
+        // Initialize Application
+        function initializeApp() {
+            // Initialize sample leaderboard data if empty
+            if (appState.students.length === 0) {
+                appState.students = [
+                    { name: 'Priya Sharma', village: 'Nabha', points: 285, badges: ['first_steps', 'quiz_master', 'video_watcher'] },
+                    { name: 'Rahul Patel', village: 'Rajpura', points: 240, badges: ['first_steps', 'discussion_hero'] },
+                    { name: 'Anita Singh', village: 'Samana', points: 195, badges: ['first_steps', 'video_watcher'] },
+                    { name: 'Vikram Kumar', village: 'Nabha', points: 165, badges: ['first_steps'] },
+                    { name: 'Meera Gupta', village: 'Patiala', points: 120, badges: ['first_steps'] }
+                ];
+            }
+            
+            updateAllDisplays();
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                themeIcon.className = 'fas fa-sun';
+                appState.theme = 'light';
+            } else {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                themeIcon.className = 'fas fa-moon';
+                appState.theme = 'dark';
+            }
+        }
+
+        // Page Navigation
+        function showPage(pageId) {
+            // Update navigation buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.nav-btn').classList.add('active');
+
+            // Update pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            setTimeout(() => {
+                document.getElementById(pageId).classList.add('active');
+                appState.currentPage = pageId;
+                
+                // Update displays when switching to pages
+                if (pageId === 'progress') {
+                    updateProgressDisplay();
+                } else if (pageId === 'leaderboard') {
+                    updateLeaderboard();
+                } else if (pageId === 'certificate') {
+                    updateCertificateDisplay();
+                }
+            }, 100);
+        }
+
+        // Student Registration
+        function registerStudent() {
+            const nameInput = document.getElementById('studentNameInput');
+            const villageInput = document.getElementById('studentVillageInput');
+            
+            const name = nameInput.value.trim();
+            const village = villageInput.value.trim() || 'Nabha';
+            
+            if (!name) {
+                showToast('Please enter your full name!', 'error');
+                return;
+            }
+
+            // Check if student already exists
+            const existingStudent = appState.students.find(s => 
+                s.name.toLowerCase() === name.toLowerCase() && 
+                s.village.toLowerCase() === village.toLowerCase()
+            );
+
+            if (existingStudent) {
+                appState.currentStudent = existingStudent;
+                showToast('Welcome back, ' + name + '!', 'success');
+            } else {
+                // Create new student
+                const newStudent = {
+                    name: name,
+                    village: village,
+                    points: 0,
+                    badges: [],
+                    joinDate: new Date().toISOString()
+                };
+                
+                appState.students.push(newStudent);
+                appState.currentStudent = newStudent;
+                
+                showToast('Registration successful! Welcome to EduQuest, ' + name + '!', 'success');
+                createConfetti();
+            }
+
+            // Clear form
+            nameInput.value = '';
+            villageInput.value = '';
+            
+            // Update all displays
+            updateAllDisplays();
+            
+            // Switch to progress page
+            setTimeout(() => {
+                showPage('progress');
+            }, 1500);
+        }
+
+        // Record Learning Action
+        function recordAction(actionType, points) {
+            if (!appState.currentStudent) {
+                showToast('Please register first!', 'error');
+                showPage('register');
+                return;
+            }
+
+            // Add points
+            appState.currentStudent.points += points;
+            
+            // Check for new badges
+            checkAndAwardBadges(actionType);
+            
+            // Show success message
+            const actionMessages = {
+                'open_app': 'App opened! Keep exploring!',
+                'complete_lesson': 'Lesson completed! Great job!',
+                'watch_video': 'Video watched! Learning in progress!',
+                'take_quiz': 'Quiz completed! Excellent work!',
+                'join_discussion': 'Discussion joined! Great participation!',
+                'submit_assignment': 'Assignment submitted! Outstanding!'
+            };
+            
+            showToast(actionMessages[actionType] + ' (+' + points + ' points)', 'success');
+            createConfetti();
+            
+            // Update displays
+            updateAllDisplays();
+        }
+
+        // Badge System
+        function checkAndAwardBadges(actionType) {
+            const student = appState.currentStudent;
+            const newBadges = [];
+
+            // First Steps Badge
+            if (!student.badges.includes('first_steps') && student.points >= 10) {
+                student.badges.push('first_steps');
+                newBadges.push('first_steps');
+            }
+
+            // Point Milestone Badges
+            if (!student.badges.includes('rising_star') && student.points >= 50) {
+                student.badges.push('rising_star');
+                newBadges.push('rising_star');
+            }
+
+            if (!student.badges.includes('learning_champion') && student.points >= 100) {
+                student.badges.push('learning_champion');
+                newBadges.push('learning_champion');
+            }
+
+            if (!student.badges.includes('digital_master') && student.points >= 200) {
+                student.badges.push('digital_master');
+                newBadges.push('digital_master');
+            }
+
+            // Activity-specific badges
+            if (actionType === 'take_quiz' && !student.badges.includes('quiz_master')) {
+                student.badges.push('quiz_master');
+                newBadges.push('quiz_master');
+            }
+
+            if (actionType === 'watch_video' && !student.badges.includes('video_watcher')) {
+                student.badges.push('video_watcher');
+                newBadges.push('video_watcher');
+            }
+
+            if (actionType === 'join_discussion' && !student.badges.includes('discussion_hero')) {
+                student.badges.push('discussion_hero');
+                newBadges.push('discussion_hero');
+            }
+
+            // Show new badge notifications
+            newBadges.forEach(badge => {
+                setTimeout(() => {
+                    showToast('New badge unlocked: ' + getBadgeName(badge) + '!', 'badge');
+                    createConfetti();
+                }, 1000);
+            });
+        }
+
+        // Get Badge Information
+        function getBadgeInfo(badgeId) {
+            const badges = {
+                'first_steps': { name: 'First Steps', icon: 'fas fa-baby', description: 'Started learning journey' },
+                'rising_star': { name: 'Rising Star', icon: 'fas fa-star', description: 'Earned 50+ points' },
+                'learning_champion': { name: 'Learning Champion', icon: 'fas fa-trophy', description: 'Earned 100+ points' },
+                'digital_master': { name: 'Digital Master', icon: 'fas fa-crown', description: 'Earned 200+ points' },
+                'quiz_master': { name: 'Quiz Master', icon: 'fas fa-brain', description: 'Completed a quiz' },
+                'video_watcher': { name: 'Video Explorer', icon: 'fas fa-video', description: 'Watched educational videos' },
+                'discussion_hero': { name: 'Discussion Hero', icon: 'fas fa-users', description: 'Participated in discussions' }
+            };
+            return badges[badgeId] || { name: badgeId, icon: 'fas fa-medal', description: 'Achievement unlocked' };
+        }
+
+        function getBadgeName(badgeId) {
+            return getBadgeInfo(badgeId).name;
+        }
+
+        // Update Progress Display
+        function updateProgressDisplay() {
+            if (!appState.currentStudent) {
+                document.getElementById('progressName').textContent = '—';
+                document.getElementById('progressVillage').textContent = 'Village: —';
+                document.getElementById('progressPointsBadge').textContent = '0 Points';
+                document.getElementById('progressBar').style.width = '0%';
+                document.getElementById('progressPercentage').textContent = '0% Complete';
+                return;
+            }
+
+            const student = appState.currentStudent;
+            const maxPoints = 300; // Maximum points for 100% completion
+            const percentage = Math.min((student.points / maxPoints) * 100, 100);
+
+            document.getElementById('progressName').textContent = student.name;
+            document.getElementById('progressVillage').textContent = 'Village: ' + student.village;
+            document.getElementById('progressPointsBadge').textContent = student.points + ' Points';
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressPercentage').textContent = Math.round(percentage) + '% Complete';
+
+            // Update badges display
+            updateBadgesDisplay();
+        }
+
+        // Update Badges Display
+        function updateBadgesDisplay() {
+            const badgesGrid = document.getElementById('badgesGrid');
+            
+            if (!appState.currentStudent || appState.currentStudent.badges.length === 0) {
+                badgesGrid.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; opacity: 0.6; font-size: 1.1rem;">
+                        Complete activities to unlock badges! 🏆
+                    </div>
+                `;
+                return;
+            }
+
+            const badgesHtml = appState.currentStudent.badges.map(badgeId => {
+                const badge = getBadgeInfo(badgeId);
+                return `
+                    <div class="badge">
+                        <i class="${badge.icon}"></i>
+                        <div>${badge.name}</div>
+                        <div style="font-size: 0.85rem; opacity: 0.8;">${badge.description}</div>
+                    </div>
+                `;
+            }).join('');
+
+            badgesGrid.innerHTML = badgesHtml;
+        }
+
+        // Update Leaderboard
+        function updateLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboardList');
+            
+            // Sort students by points (descending)
+            const sortedStudents = [...appState.students].sort((a, b) => b.points - a.points);
+            
+            const leaderboardHtml = sortedStudents.map((student, index) => {
+                const rank = index + 1;
+                let rankClass = '';
+                if (rank === 1) rankClass = 'first';
+                else if (rank === 2) rankClass = 'second';
+                else if (rank === 3) rankClass = 'third';
+                
+                const isCurrentStudent = appState.currentStudent && 
+                    student.name === appState.currentStudent.name && 
+                    student.village === appState.currentStudent.village;
+
+                return `
+                    <div class="leaderboard-item glass ${isCurrentStudent ? 'current-student' : ''}" 
+                         style="${isCurrentStudent ? 'border: 2px solid #667eea; box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);' : ''}">
+                        <div class="leaderboard-rank ${rankClass}">
+                            ${rank <= 3 ? (rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉') : rank}
+                        </div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">
+                                ${student.name}
+                                ${isCurrentStudent ? '<span style="color: #667eea; font-size: 0.9rem;"> (You)</span>' : ''}
+                            </div>
+                            <div class="leaderboard-village">${student.village}</div>
+                        </div>
+                        <div class="leaderboard-points">${student.points}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            leaderboardList.innerHTML = leaderboardHtml;
+        }
+
+        // Update Certificate Display
+        function updateCertificateDisplay() {
+            const certificateName = document.getElementById('certificateName');
+            const certificateDate = document.getElementById('certificateDate');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            if (!appState.currentStudent) {
+                certificateName.textContent = 'Student Name';
+                certificateDate.textContent = 'Date: Not yet earned';
+                generateBtn.innerHTML = '<i class="fas fa-download"></i> Generate Certificate (Need 200+ points)';
+                generateBtn.disabled = true;
+                return;
+            }
+
+            certificateName.textContent = appState.currentStudent.name;
+            
+            if (appState.currentStudent.points >= 200) {
+                certificateDate.textContent = 'Date: ' + new Date().toLocaleDateString();
+                generateBtn.innerHTML = '<i class="fas fa-download"></i> Generate Certificate';
+                generateBtn.disabled = false;
+            } else {
+                certificateDate.textContent = 'Date: Not yet earned';
+                generateBtn.innerHTML = `<i class="fas fa-download"></i> Generate Certificate (Need ${200 - appState.currentStudent.points} more points)`;
+                generateBtn.disabled = true;
+            }
+        }
+
+        // Generate Certificate
+        function generateCertificate() {
+            if (!appState.currentStudent || appState.currentStudent.points < 200) {
+                showToast('You need at least 200 points to generate a certificate!', 'error');
+                return;
+            }
+
+            showToast('Certificate generated successfully! 🎉', 'success');
+            createConfetti();
+            
+            // In a real application, this would trigger a download or email
+            // For this demo, we'll just show a success message
+            setTimeout(() => {
+                showToast('Certificate saved to your achievements!', 'success');
+            }, 1500);
+        }
+
+        // Update All Displays
+        function updateAllDisplays() {
+            updateProgressDisplay();
+            updateLeaderboard();
+            updateCertificateDisplay();
+        }
+
+        // Reset Application
+        function resetApp() {
+            if (confirm('Are you sure you want to reset all data? This action cannot be undone.')) {
+                appState.currentStudent = null;
+                appState.students = [];
+                
+                // Reinitialize with sample data
+                initializeApp();
+                
+                showToast('Application reset successfully!', 'success');
+                showPage('register');
+            }
+        }
+
+        // Toast Notifications
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-triangle',
+                badge: 'fas fa-medal'
+            };
+            
+            const colors = {
+                success: 'background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);',
+                error: 'background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);',
+                badge: 'background: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);'
+            };
+            
+            toast.className = 'toast glass';
+            toast.style.cssText = colors[type] + 'color: white;';
+            toast.innerHTML = `
+                <i class="${icons[type]}"></i>
+                <span>${message}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 4000);
+        }
+
+        // Confetti Animation
+        function createConfetti() {
+            const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#fdbb2d', '#22c1c3'];
+            const confettiCount = 50;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.cssText = `
+                        left: ${Math.random() * 100}%;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        animation-delay: ${Math.random() * 2}s;
+                        animation-duration: ${3 + Math.random() * 2}s;
+                    `;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 6000);
+                }, i * 50);
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && appState.currentPage !== 'register') {
+                showPage('register');
+            }
+        });
+    </script>
+</body>
+</html>
